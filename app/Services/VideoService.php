@@ -41,7 +41,7 @@ readonly class VideoService
      * @return void
      * @throws Throwable
      */
-    public function store(VideoStoreDTO $storeDTO)
+    public function store(VideoStoreDTO $storeDTO): void
     {
         $result = DB::transaction(function () use ($storeDTO) {
 
@@ -56,13 +56,11 @@ readonly class VideoService
 
         }, 2);
 
-        app(RabbitMQService::class)->publish('video.processing', [
+        app(RabbitMQService::class)->publish('video.processing.queue', [
             'video_id' => $result->id,
             'path' => $result->path,
             'user_id' => $result->user_id,
         ]);
-
-        dd($result);
 
     }
 
