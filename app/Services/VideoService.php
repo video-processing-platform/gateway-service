@@ -58,7 +58,7 @@ readonly class VideoService
 
         app(RabbitMQService::class)->publish('video.processing.queue', [
             'video_id' => $result->id,
-            'path' => $result->path,
+            'object_key' => $result->path,
         ]);
 
     }
