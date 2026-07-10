@@ -59,7 +59,6 @@ readonly class VideoService
         app(RabbitMQService::class)->publish('video.processing.queue', [
             'video_id' => $result->id,
             'path' => $result->path,
-            'user_id' => $result->user_id,
         ]);
 
     }
@@ -71,7 +70,7 @@ readonly class VideoService
     public function destroy(int $id): void
     {
         $data = $this->repository->findOne($id);
-        Storage::disk('public')->delete($data->path);
+        Storage::disk('s3')->delete($data->path);
         $data->delete();
     }
 
@@ -81,8 +80,8 @@ readonly class VideoService
      */
     private function upload(UploadedFile $file): string
     {
-        $path = auth()->id() . '/' . now()->format('Y-m-d') . '/' . now()->format('H-i-s') . '-' . $file->getClientOriginalName();
-        Storage::disk('public')->put($path, $file->getContent());
+        $path = auth()->id() . '/' . now()->format('Y-m-d') . '-' . now()->format('H-i-s') . '/main/' . $file->getClientOriginalName();
+        Storage::disk('s3')->put($path, $file->getContent());
         return $path;
     }
 
